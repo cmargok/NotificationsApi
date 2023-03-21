@@ -7,7 +7,7 @@ namespace Notifications.Application.Models.Email
     {
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
-
+       
         private SecureString Password;
 
 

@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "secrets1": {
+      "secretStore": null,
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.KeyVault/vaults/cmargokKeys",
+      "type": "secrets.keyVault",
+      "connectionId": "KeyVaultUrl",
+      "dynamicId": null
+    }
+  }
+}

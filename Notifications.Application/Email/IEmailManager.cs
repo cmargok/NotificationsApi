@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Notifications.Application.Models.Email;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,8 @@ namespace Notifications.Application.Email
 {
     public interface IEmailManager
     {
-        void ValidateData();
 
-        void SendEmail();
+        Task<bool> SendEmail(EmailToSendDto emailToSend);
     }
 
 }

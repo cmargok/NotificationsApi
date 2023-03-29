@@ -7,7 +7,7 @@ var Enviroment = builder.Environment.IsDevelopment();
 
 var keyVaultEndpoint = Environment.GetEnvironmentVariable("KeyVaultUrl")!.ToString();
 
-builder.Services.AddOptionsConfigs(builder.Configuration, Enviroment);
+builder.Services.AddOptionsConfigs(builder.Configuration, !Enviroment);
 
 builder.Services.RegisterServices();
 // Add services to the container.

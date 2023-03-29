@@ -41,7 +41,7 @@ namespace Notifications.Infraestruture.Externals.Azure
                 
                 dataSecrets = IOReader.GetLinesFromFile(path, FileName + ".txt");
 
-                if (dataSecrets.Count != 0) throw new FileLoadException();
+                if (dataSecrets.Count == 0) throw new FileLoadException();
                 
                 return dataSecrets;
             }
@@ -50,7 +50,7 @@ namespace Notifications.Infraestruture.Externals.Azure
             {
                 dataSecrets.Add(await GetValueFromSeret(secret, KeyVaultUrlEnviroment));
             }
-            if (dataSecrets.Count != 0) throw new Exception("No secrets loaded");        
+            if (dataSecrets.Count == 0) throw new Exception("No secrets loaded");        
 
             return dataSecrets;
         }

@@ -20,26 +20,17 @@ namespace Notifications.Infraestruture.Email
 
             var tempData = data[0].Split('=');
 
-            var remitente = new RemitenteData { Email = tempData[0] };
+            var remitente = new RemitenteData { Email = tempData[1] };
 
             tempData = data[1].Split('=');
 
-            remitente.SetPassword(tempData[0]);
+            remitente.SetPassword(tempData[1]);
 
             return remitente;
         }
 
-        public async Task<bool> SendEmail(EmailToSendDto email, RemitenteData remitente)
+        public Task<bool> SendEmail(EmailToSendDto email, RemitenteData remitente)
         {
-
-                        // Configurar el cliente de correo electrónico
-            SmtpClient cliente = new("smtp.office365.com", 587)
-            {
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(remitente.Email, remitente.GetPassword()),
-                EnableSsl = true,
-
-            };
             MailMessage mail;
 
             if (email.Html)
@@ -48,17 +39,10 @@ namespace Notifications.Infraestruture.Email
                 mail.From = new MailAddress(remitente.Email);
                 mail.To.Add(email.EmailDestinatario);
                 mail.IsBodyHtml = true;
-                mail.Body = "<h1>Este es un ejemplo de correo electrónico en formato HTML</h1>" +
-                   "<p>Este es un párrafo de texto.</p>" +
-                   "<ul>" +
-                   "<li>Item 1</li>" +
-                   "<li>Item 2</li>" +
-                   "<li>Item 3</li>" +
-                   "</ul>";
+                mail.Body = email.HtmlBody;
             }
             else
-            {
-                // Crear el mensaje de correo electrónico
+            { 
                 mail = new MailMessage(remitente.Email, email.EmailDestinatario, email.Asunto, email.Mensaje);
             }
 
@@ -66,14 +50,21 @@ namespace Notifications.Infraestruture.Email
             // Enviar el correo electrónico
             try
             {
-                await cliente.SendMailAsync(mail);
-                return true;
+                SmtpClient cliente = new("smtp.office365.com", 587);
+
+                cliente.UseDefaultCredentials = false;
+                cliente.Credentials = new NetworkCredential(remitente.Email, remitente.GetPassword());
+                cliente.EnableSsl = true;
+
+                cliente.Send(mail);
+                return Task.FromResult(true);
             }
+
             catch (Exception e)
             {
                 //aqui iria logging
 
-                return false;
+                return Task.FromResult(false);
             }
 
         }

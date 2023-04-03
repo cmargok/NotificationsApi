@@ -35,7 +35,7 @@ namespace Notifications.Infraestruture.Externals.Azure
         {
 
             List<string> dataSecrets = new();
-            if (IsDevelopment)
+            if (!IsDevelopment)
             {
                 string path = "C:\\Secrets";
                 

@@ -40,6 +40,7 @@ namespace Notifications.Infraestruture.Email
                 mail.To.Add(email.EmailDestinatario);
                 mail.IsBodyHtml = true;
                 mail.Body = email.HtmlBody;
+                mail.Subject = email.Asunto;
             }
             else
             { 

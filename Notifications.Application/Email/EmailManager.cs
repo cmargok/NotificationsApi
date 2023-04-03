@@ -37,7 +37,7 @@ namespace Notifications.Application.Email
 
             if (emailToSend.Html && string.IsNullOrEmpty(emailToSend.HtmlBody)) return false;
 
-            if (string.IsNullOrEmpty(emailToSend.Mensaje))  return false;
+            if (!emailToSend.Html && string.IsNullOrEmpty(emailToSend.Mensaje))  return false;
 
             return true;
 

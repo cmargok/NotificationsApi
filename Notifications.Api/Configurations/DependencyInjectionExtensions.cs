@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Notifications.Application.Configurations;
 using Notifications.Application.Email;
 using Notifications.Application.Email.Contracts;
+using Notifications.Application.Quarzo;
 using Notifications.Infraestruture.Email;
 
 namespace Notifications.API.Configurations
@@ -14,6 +15,7 @@ namespace Notifications.API.Configurations
         {
             services.AddScoped<IEmailManager, EmailManager>();
             services.AddScoped<IEmailOutlook, EmailOutlook>();
+            services.AddScoped<Imio, CycleService>();
             return services;
         }
     }

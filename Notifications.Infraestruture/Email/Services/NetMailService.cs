@@ -9,10 +9,11 @@ using Notifications.Application.Email.Contracts;
 using Notifications.Application.Models.Email;
 using Notifications.Infraestruture.Externals.Azure;
 
-namespace Notifications.Infraestruture.Email
+namespace Notifications.Infraestruture.Email.Services
 {
-    public class EmailOutlook: IEmailOutlook
-    { 
+
+    public class NetMailService : IEmailService
+    {
 
         public async Task<bool> SendEmail(EmailToSendDto email, OutlookCredentials credentials)
         {
@@ -30,11 +31,11 @@ namespace Notifications.Infraestruture.Email
                 mail.Subject = email.Subject;
             }
             else
-            { 
+            {
                 mail = new MailMessage(email.EmailFrom, email.EmailTo, email.Subject, email.Message);
-                
+
             }
-            
+
 
             // Enviar el correo electrónico
             try
@@ -61,12 +62,12 @@ namespace Notifications.Infraestruture.Email
             finally
             {
                 mail.Dispose();
-               
+
             }
 
-            return success; 
+            return success;
         }
 
-        
+
     }
 }

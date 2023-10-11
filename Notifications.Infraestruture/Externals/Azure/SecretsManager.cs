@@ -1,17 +1,10 @@
 ﻿using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Notifications.Application.Azure;
-using Notifications.Application.Models.Email;
-using Notifications.Infrastructure.IO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Notifications.Infraestruture.Externals.Azure
 {
- 
+
     public class SecretsManager : ISecretsManager
     {
         public async Task<string> GetConnectionString(string connection, string KeyVaultUrlEnviroment = "")

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Notifications.Application.Configurations
 {
     
-    public class OutlookSettings
+    public class CredentialsKeySettings
     {
         public string RemitenteOutlook { get; set; } = string.Empty;
         public string PassWordOutlook { get; set; } = string.Empty;

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Notifications.Application.Email;
+using Notifications.Application.Email.Contracts;
 using Notifications.Application.Models.Email;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -23,7 +23,7 @@ namespace Notifications.Api.Controllers
         /// 
         /// </summary>
         /// <param name="emailManager"></param>
-        public EmailController( IEmailManager emailManager)
+        public EmailController(IEmailManager emailManager)
         {
             _emailManager = emailManager;
         }

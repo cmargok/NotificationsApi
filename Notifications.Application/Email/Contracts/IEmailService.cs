@@ -2,7 +2,7 @@
 
 namespace Notifications.Application.Email.Contracts
 {
-    public interface IEmailOutlook
+    public interface IEmailService
     {
         public Task<bool> SendEmail(EmailToSendDto email, OutlookCredentials remitente);
     }

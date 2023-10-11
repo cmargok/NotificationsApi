@@ -2,20 +2,22 @@
 using Notifications.Application.Azure;
 using Notifications.Application.Configurations;
 using Notifications.Application.Email.Contracts;
+using Notifications.Application.Email.Contracts.Factory;
 using Notifications.Application.Models.Email;
+using Notifications.Application.Utils;
 
 namespace Notifications.Application.Email
 {
     public class EmailManager : IEmailManager
     {
-        private readonly IEmailOutlook _outlook;
+        private readonly IEmailService _emailService;
         private readonly ISecretsManager _secretsManager;
-        private readonly OutlookSettings _OutlookSettings;
-
-        public EmailManager(IEmailOutlook outlook, IOptions<OutlookSettings> settings, ISecretsManager secretsManager)
+        private readonly CredentialsKeySettings _credentialsKeySettings;
+        
+        public EmailManager(IEmailFactory emailFactory, IOptions<CredentialsKeySettings> settings, ISecretsManager secretsManager, EnumMailServices mailService)
         {
-            _outlook = outlook;
-            _OutlookSettings = settings.Value;
+            _emailService = emailFactory.GetEmailService(mailService); 
+            _credentialsKeySettings = settings.Value;
             _secretsManager = secretsManager;
         }
 
@@ -26,7 +28,7 @@ namespace Notifications.Application.Email
             {
                 var Credentials = await SetOutlookCredentials();
 
-                var response = await _outlook.SendEmail(emailToSend, Credentials);
+                var response = await _emailService.SendEmail(emailToSend, Credentials);
 
                 return response;               
             }
@@ -52,12 +54,11 @@ namespace Notifications.Application.Email
       
         private async Task<OutlookCredentials> SetOutlookCredentials()
         {
-            var secretsDictionary = await _secretsManager.GetSecretsAsync(_OutlookSettings.Url, _OutlookSettings.GetData());
+            var secretsDictionary = await _secretsManager.GetSecretsAsync(_credentialsKeySettings.Url, _credentialsKeySettings.GetData());
 
+            var credentials = new OutlookCredentials { Email = secretsDictionary[_credentialsKeySettings.RemitenteOutlook] };
 
-            var credentials = new OutlookCredentials { Email = secretsDictionary[_OutlookSettings.RemitenteOutlook] };
-
-            credentials.SetPassword(secretsDictionary[_OutlookSettings.PassWordOutlook]);
+            credentials.SetPassword(secretsDictionary[_credentialsKeySettings.PassWordOutlook]);
 
             return credentials;
         }

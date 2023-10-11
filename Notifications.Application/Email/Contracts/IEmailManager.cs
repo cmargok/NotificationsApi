@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Notifications.Application.Email
+namespace Notifications.Application.Email.Contracts
 {
     public interface IEmailManager
     {

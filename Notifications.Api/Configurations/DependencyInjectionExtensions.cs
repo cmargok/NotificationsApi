@@ -1,9 +1,13 @@
 ﻿
+using Microsoft.Extensions.Options;
 using Notifications.Application.Azure;
 using Notifications.Application.Configurations;
 using Notifications.Application.Email;
 using Notifications.Application.Email.Contracts;
+using Notifications.Application.Email.Contracts.Factory;
+using Notifications.Application.Models.Email;
 using Notifications.Infraestruture.Email;
+using Notifications.Infraestruture.Email.Services;
 using Notifications.Infraestruture.Externals.Azure;
 
 namespace Notifications.API.Configurations
@@ -18,8 +22,21 @@ namespace Notifications.API.Configurations
     /// <returns></returns>
         public static IServiceCollection RegisterServices(this IServiceCollection services)
         {
-            services.AddScoped<IEmailManager, EmailManager>();
-            services.AddScoped<IEmailOutlook, EmailOutlook>();
+            //email manager
+            services.AddScoped<IEmailManager, EmailManager>(provider =>
+            {
+                var instance = new EmailManager(
+                    provider.GetRequiredService<IEmailFactory>(), 
+                    provider.GetRequiredService<IOptions<CredentialsKeySettings>>(), 
+                    provider.GetRequiredService<ISecretsManager>(), Application.Utils.EnumMailServices.MailNet);
+
+                return instance;
+            });
+
+            //factory to instance the mailservice library to use
+            services.AddScoped<IEmailFactory, EmailFactory>();
+
+            //azure secrets
             services.AddScoped<ISecretsManager, SecretsManager>();
             return services;
         }
@@ -39,12 +56,12 @@ namespace Notifications.API.Configurations
         /// <returns></returns>
         public static IServiceCollection AddOptionsConfigs(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<OutlookSettings>(options =>
+            services.Configure<CredentialsKeySettings>(options =>
             {
                 options.Url = Environment.GetEnvironmentVariable("VaultUri")!.ToString();
             });
 
-            services.Configure<OutlookSettings>(config.GetSection("Outlook"));
+            services.Configure<CredentialsKeySettings>(config.GetSection("Outlook"));
             return services;
         }
     }

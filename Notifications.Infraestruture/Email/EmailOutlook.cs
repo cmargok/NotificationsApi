@@ -12,62 +12,59 @@ using Notifications.Infraestruture.Externals.Azure;
 namespace Notifications.Infraestruture.Email
 {
     public class EmailOutlook: IEmailOutlook
-    {
-        public async Task<RemitenteData> SetRemitenteData(bool IsDevelopment, string KeyVaultUrlEnviroment, string FileName,params string[] secrets)
-        {
+    { 
 
-            var data = await SecretsManager.GetRemitenteDataAsync(IsDevelopment, KeyVaultUrlEnviroment, FileName,secrets);
-
-            var tempData = data[0].Split('=');
-
-            var remitente = new RemitenteData { Email = tempData[1] };
-
-            tempData = data[1].Split('=');
-
-            remitente.SetPassword(tempData[1]);
-
-            return remitente;
-        }
-
-        public Task<bool> SendEmail(EmailToSendDto email, RemitenteData remitente)
+        public async Task<bool> SendEmail(EmailToSendDto email, OutlookCredentials credentials)
         {
             MailMessage mail;
-
+            var success = false;
             if (email.Html)
             {
-                mail = new MailMessage();
-                mail.From = new MailAddress(remitente.Email);
-                mail.To.Add(email.EmailDestinatario);
+                mail = new MailMessage
+                {
+                    From = new MailAddress(email.EmailFrom, "kevin")
+                };
+                mail.To.Add(email.EmailTo);
                 mail.IsBodyHtml = true;
                 mail.Body = email.HtmlBody;
-                mail.Subject = email.Asunto;
+                mail.Subject = email.Subject;
             }
             else
             { 
-                mail = new MailMessage(remitente.Email, email.EmailDestinatario, email.Asunto, email.Mensaje);
+                mail = new MailMessage(email.EmailFrom, email.EmailTo, email.Subject, email.Message);
+                
             }
-
+            
 
             // Enviar el correo electrónico
             try
             {
-                SmtpClient cliente = new("smtp.office365.com", 587);
+
+                using SmtpClient cliente = new("smtp.office365.com", 587);
+
 
                 cliente.UseDefaultCredentials = false;
-                cliente.Credentials = new NetworkCredential(remitente.Email, remitente.GetPassword());
+                cliente.Credentials = new NetworkCredential(credentials.Email, credentials.GetPassword());
                 cliente.EnableSsl = true;
+                cliente.DeliveryMethod = SmtpDeliveryMethod.Network;
 
                 cliente.Send(mail);
-                return Task.FromResult(true);
+                success = true;
             }
 
             catch (Exception e)
             {
                 //aqui iria logging
 
-                return Task.FromResult(false);
+                success = false;
+            }
+            finally
+            {
+                mail.Dispose();
+               
             }
 
+            return success; 
         }
 
         

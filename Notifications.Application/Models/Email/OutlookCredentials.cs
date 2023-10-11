@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Notifications.Application.Models.Email
 {
-    public class RemitenteData
+    public class OutlookCredentials
     {
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
        
-        private SecureString Password;
+        private SecureString? Password;
 
 
         public SecureString GetPassword() { return Password; }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Notifications.Application.Azure;
 using Notifications.Application.Configurations;
 using Notifications.Application.Email.Contracts;
 using Notifications.Application.Models.Email;
@@ -8,49 +9,63 @@ namespace Notifications.Application.Email
     public class EmailManager : IEmailManager
     {
         private readonly IEmailOutlook _outlook;
+        private readonly ISecretsManager _secretsManager;
         private readonly OutlookSettings _OutlookSettings;
-        public EmailManager(IEmailOutlook outlook, IOptions<OutlookSettings> settings)
+
+        public EmailManager(IEmailOutlook outlook, IOptions<OutlookSettings> settings, ISecretsManager secretsManager)
         {
             _outlook = outlook;
             _OutlookSettings = settings.Value;
+            _secretsManager = secretsManager;
         }
+
 
         public async Task<bool> SendEmail(EmailToSendDto emailToSend)
         {
             if(ValidateData(emailToSend))
             {
-                var remitente = await SetRemitenteData();
-                var response = await _outlook.SendEmail(emailToSend, remitente);
+                var Credentials = await SetOutlookCredentials();
 
-                if (response) return true;               
+                var response = await _outlook.SendEmail(emailToSend, Credentials);
+
+                return response;               
             }
             return false;
         }
 
         private bool ValidateData(EmailToSendDto emailToSend)
         {
-            if(emailToSend == null) throw new ArgumentNullException("email");
+            ArgumentNullException.ThrowIfNull(emailToSend);
 
-            if (string.IsNullOrEmpty(emailToSend.EmailDestinatario)) return false;
+            if (string.IsNullOrEmpty(emailToSend.EmailTo)) return false;
 
-            if (string.IsNullOrEmpty(emailToSend.Asunto) && emailToSend.Asunto.Length > 2)  return false;
+            if (string.IsNullOrEmpty(emailToSend.Subject) && emailToSend.Subject.Length > 2)  return false;
 
             if (emailToSend.Html && string.IsNullOrEmpty(emailToSend.HtmlBody)) return false;
 
-            if (!emailToSend.Html && string.IsNullOrEmpty(emailToSend.Mensaje))  return false;
+            if (!emailToSend.Html && string.IsNullOrEmpty(emailToSend.Message))  return false;
 
             return true;
-
-
         }
 
 
-        private async Task<RemitenteData> SetRemitenteData()       
+      
+        private async Task<OutlookCredentials> SetOutlookCredentials()
         {
-            return await _outlook.SetRemitenteData(_OutlookSettings.IsDevelopment, Environment.GetEnvironmentVariable("KeyVaultUrl")!.ToString(), _OutlookSettings.FileName, _OutlookSettings.GetData());
+            //var secretsDictionary = await _secretsManager.GetSecretsAsync(_OutlookSettings.Url, _OutlookSettings.GetData());
+
+         
+            //var credentials = new OutlookCredentials { Email = secretsDictionary[_OutlookSettings.RemitenteOutlook] };
+
+            //credentials.SetPassword(secretsDictionary[_OutlookSettings.PassWordOutlook]);
+
+            var credentials = new OutlookCredentials { Email = "cmargokk@hotmail.com" };
+            
+            credentials.SetPassword("Dikelu0102");
+
+            return credentials;
         }
 
-        
     }
 
 }

@@ -6,21 +6,13 @@ using System.Threading.Tasks;
 
 namespace Notifications.Application.Configurations
 {
-    public class Options
-    {
-    }
-
+    
     public class OutlookSettings
     {
         public string RemitenteOutlook { get; set; } = string.Empty;
         public string PassWordOutlook { get; set; } = string.Empty;
-        public string FileName { get; set; } = string.Empty;
-        public bool IsDevelopment { get; set; } 
+        public string Url {  get; set; } = string.Empty;
 
-
-        public string[] GetData()
-        {
-            return new string[] { RemitenteOutlook, PassWordOutlook };
-        }
+        public string[] GetData() => [RemitenteOutlook, PassWordOutlook];
     }
 }

@@ -1,37 +1,35 @@
 using Azure.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Notifications.API.Configurations;
-using Notifications.Application.Quarzo;
 using Quartz;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var Enviroment = builder.Environment.IsDevelopment(); 
+//var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+//builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
 
-var keyVaultEndpoint = Environment.GetEnvironmentVariable("KeyVaultUrl")!.ToString();
 
-builder.Services.AddOptionsConfigs(builder.Configuration, !Enviroment);
+builder.Services.AddOptionsConfigs(builder.Configuration);
 
 builder.Services.RegisterServices();
 // Add services to the container.
 
-builder.Services.AddScoped<RecurrentJob>();
-
-builder.Services.AddQuartz(q =>
-{
-    q.UseMicrosoftDependencyInjectionJobFactory();
-    q.ScheduleJob<RecurrentJob>(
-        tr =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            tr.StartAt(DateTimeOffset.UtcNow.AddSeconds(30));
-            tr.WithSimpleSchedule(s => s.WithIntervalInMinutes(1).RepeatForever());
-            
-        });
-
-});
-builder.Services.AddQuartzServer(options => options.WaitForJobsToComplete = true);
-
-
-
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+            ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]!))
+        };
+    });
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

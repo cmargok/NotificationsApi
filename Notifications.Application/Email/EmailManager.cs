@@ -52,16 +52,12 @@ namespace Notifications.Application.Email
       
         private async Task<OutlookCredentials> SetOutlookCredentials()
         {
-            //var secretsDictionary = await _secretsManager.GetSecretsAsync(_OutlookSettings.Url, _OutlookSettings.GetData());
+            var secretsDictionary = await _secretsManager.GetSecretsAsync(_OutlookSettings.Url, _OutlookSettings.GetData());
 
-         
-            //var credentials = new OutlookCredentials { Email = secretsDictionary[_OutlookSettings.RemitenteOutlook] };
 
-            //credentials.SetPassword(secretsDictionary[_OutlookSettings.PassWordOutlook]);
+            var credentials = new OutlookCredentials { Email = secretsDictionary[_OutlookSettings.RemitenteOutlook] };
 
-            var credentials = new OutlookCredentials { Email = "cmargokk@hotmail.com" };
-            
-            credentials.SetPassword("Dikelu0102");
+            credentials.SetPassword(secretsDictionary[_OutlookSettings.PassWordOutlook]);
 
             return credentials;
         }

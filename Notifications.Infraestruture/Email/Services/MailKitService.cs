@@ -12,10 +12,10 @@ using Notifications.Infraestruture.Externals.Azure;
 namespace Notifications.Infraestruture.Email.Services
 {
 
-    public class NetMailService : IEmailService
+    public class MailKitService : IEmailService
     {
 
-        public Task<bool> SendEmail(EmailToSendDto email, ServerCredentialsConfiguration credentialsConfiguration)
+        public Task<bool> SendEmail(EmailToSendDto email, ServerCredentialsConfiguration credentialsConfiguration, CancellationToken cancellationToken = default)
         {
             MailMessage mail;
             var success = false;
@@ -46,7 +46,7 @@ namespace Notifications.Infraestruture.Email.Services
                     );
 
                 SmtpClient.Credentials = new NetworkCredential(
-                   credentialsConfiguration.credentials.Email,
+                   credentialsConfiguration.credentials.UserName,
                    credentialsConfiguration.credentials.GetPassword()
                    );
 

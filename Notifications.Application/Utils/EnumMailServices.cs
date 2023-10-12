@@ -2,9 +2,8 @@
 {
     public enum EnumMailServices
     {
-
         NetMail,
-        MimeKit
+        MailKit
     }
 
 

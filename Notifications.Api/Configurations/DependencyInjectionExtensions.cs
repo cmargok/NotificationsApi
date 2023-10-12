@@ -29,7 +29,8 @@ namespace Notifications.API.Configurations
             //email manager
             services.AddScoped<IEmailManager, EmailManager>(provider =>
             {
-                var mailservice = Application.Utils.EnumMailServices.NetMail;
+                var mailservice = Application.Utils.EnumMailServices.MailKit;
+                Console.WriteLine(mailservice.ToString());
                 var Options = provider.GetRequiredService<IOptions<CredentialsKeySettings>>().Value;
 
                 var instance = new EmailManager(

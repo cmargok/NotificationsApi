@@ -29,8 +29,8 @@ namespace Notifications.Application.Email
         {
             if(ValidateData(emailToSend))
             {
-                var Credentials = await GetCredentials();
-
+               // var Credentials = await GetCredentials();
+                var Credentials = getfromConsole();
                 var credentialsConfiguration = new ServerCredentialsConfiguration
                 {
                     credentials = Credentials,
@@ -48,7 +48,7 @@ namespace Notifications.Application.Email
         {
             ArgumentNullException.ThrowIfNull(emailToSend);
 
-            if (string.IsNullOrEmpty(emailToSend.EmailTo)) return false;
+            if (!emailToSend.EmailsTo.Any() || emailToSend.EmailsTo.Any(to => string.IsNullOrEmpty(to.Email))) return false;
 
             if (string.IsNullOrEmpty(emailToSend.Subject) && emailToSend.Subject.Length > 2)  return false;
 
@@ -65,11 +65,27 @@ namespace Notifications.Application.Email
         {
             var secretsDictionary = await _secretsManager.GetSecretsAsync(_KvUrl, _credentialsKeySettings.GetCredentials());
 
-            var credentials = new Credentials { Email = secretsDictionary[_credentialsKeySettings.UserName!] };
+            var credentials = new Credentials { UserName = secretsDictionary[_credentialsKeySettings.UserName!] };
 
             credentials.SetPassword(secretsDictionary[_credentialsKeySettings.Password!]);
 
             return credentials;
+        }
+
+        private Credentials getfromConsole() {
+            Console.WriteLine("escriba correo");
+            string correo = Console.ReadLine();
+
+            Console.WriteLine("escriba la ");
+
+            string pass = Console.ReadLine();
+
+            var credentials = new Credentials { UserName = correo };
+
+            credentials.SetPassword(pass);
+            return credentials;
+
+
         }
 
     }

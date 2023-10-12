@@ -12,8 +12,8 @@ namespace Notifications.Infraestruture.Email
 
             return mailServices switch
             {
-                EnumMailServices.NetMail => new NetMailService(),
-                EnumMailServices.MimeKit => new MimeKitService(),
+                EnumMailServices.NetMail => new MailKitService(),
+                EnumMailServices.MailKit => new MimeKitService(),
                 _ => throw new NotSupportedException()
             };
         }

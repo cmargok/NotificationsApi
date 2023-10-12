@@ -12,7 +12,7 @@ namespace Notifications.Infraestruture.Email
 
             return mailServices switch
             {
-                EnumMailServices.MailNet => new NetMailService(),
+                EnumMailServices.NetMail => new NetMailService(),
                 EnumMailServices.MimeKit => new MimeKitService(),
                 _ => throw new NotSupportedException()
             };

@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
 using Notifications.Application.Azure;
-using Notifications.Application.Configurations;
 using Notifications.Application.Email.Contracts;
 using Notifications.Application.Email.Contracts.Factory;
 using Notifications.Application.Models.Email;
+using Notifications.Application.Models.Email.Settings;
 using Notifications.Application.Utils;
 
 namespace Notifications.Application.Email
@@ -12,13 +12,16 @@ namespace Notifications.Application.Email
     {
         private readonly IEmailService _emailService;
         private readonly ISecretsManager _secretsManager;
-        private readonly CredentialsKeySettings _credentialsKeySettings;
-        
-        public EmailManager(IEmailFactory emailFactory, IOptions<CredentialsKeySettings> settings, ISecretsManager secretsManager, EnumMailServices mailService)
+        private readonly MailSettings _credentialsKeySettings;
+        private readonly string _KvUrl;
+
+        public EmailManager(IEmailFactory emailFactory, MailSettings settings, 
+                            ISecretsManager secretsManager, EnumMailServices mailService, string kvUrl)
         {
             _emailService = emailFactory.GetEmailService(mailService); 
-            _credentialsKeySettings = settings.Value;
+            _credentialsKeySettings = settings;
             _secretsManager = secretsManager;
+            _KvUrl = kvUrl;
         }
 
 
@@ -26,9 +29,15 @@ namespace Notifications.Application.Email
         {
             if(ValidateData(emailToSend))
             {
-                var Credentials = await SetOutlookCredentials();
+                var Credentials = await GetCredentials();
 
-                var response = await _emailService.SendEmail(emailToSend, Credentials);
+                var credentialsConfiguration = new ServerCredentialsConfiguration
+                {
+                    credentials = Credentials,
+                    config = _credentialsKeySettings.ServerConfiguration
+                };
+
+                var response = await _emailService.SendEmail(emailToSend, credentialsConfiguration);
 
                 return response;               
             }
@@ -52,13 +61,13 @@ namespace Notifications.Application.Email
 
 
       
-        private async Task<OutlookCredentials> SetOutlookCredentials()
+        private async Task<Credentials> GetCredentials()
         {
-            var secretsDictionary = await _secretsManager.GetSecretsAsync(_credentialsKeySettings.Url, _credentialsKeySettings.GetData());
+            var secretsDictionary = await _secretsManager.GetSecretsAsync(_KvUrl, _credentialsKeySettings.GetCredentials());
 
-            var credentials = new OutlookCredentials { Email = secretsDictionary[_credentialsKeySettings.RemitenteOutlook] };
+            var credentials = new Credentials { Email = secretsDictionary[_credentialsKeySettings.UserName!] };
 
-            credentials.SetPassword(secretsDictionary[_credentialsKeySettings.PassWordOutlook]);
+            credentials.SetPassword(secretsDictionary[_credentialsKeySettings.Password!]);
 
             return credentials;
         }

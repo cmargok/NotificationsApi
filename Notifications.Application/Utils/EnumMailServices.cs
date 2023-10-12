@@ -3,7 +3,7 @@
     public enum EnumMailServices
     {
 
-        MailNet,
+        NetMail,
         MimeKit
     }
 

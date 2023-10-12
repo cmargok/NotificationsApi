@@ -1,34 +1,44 @@
 ﻿
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Notifications.Application.Azure;
-using Notifications.Application.Configurations;
 using Notifications.Application.Email;
 using Notifications.Application.Email.Contracts;
 using Notifications.Application.Email.Contracts.Factory;
 using Notifications.Application.Models.Email;
+using Notifications.Application.Models.Email.Settings;
 using Notifications.Infraestruture.Email;
 using Notifications.Infraestruture.Email.Services;
 using Notifications.Infraestruture.Externals.Azure;
 
 namespace Notifications.API.Configurations
-{/// <summary>
-/// 
-/// </summary>
-    public static class DependencyInjectionExtensions
-    {/// <summary>
+{
+
+    /// <summary>
     /// 
     /// </summary>
-    /// <param name="services"></param>
-    /// <returns></returns>
+    public static class DependencyInjectionExtensions
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static IServiceCollection RegisterServices(this IServiceCollection services)
         {
             //email manager
             services.AddScoped<IEmailManager, EmailManager>(provider =>
             {
+                var mailservice = Application.Utils.EnumMailServices.NetMail;
+                var Options = provider.GetRequiredService<IOptions<CredentialsKeySettings>>().Value;
+
                 var instance = new EmailManager(
                     provider.GetRequiredService<IEmailFactory>(), 
-                    provider.GetRequiredService<IOptions<CredentialsKeySettings>>(), 
-                    provider.GetRequiredService<ISecretsManager>(), Application.Utils.EnumMailServices.MailNet);
+                    Options.Services.FirstOrDefault(o => o.ServiceName == mailservice.ToString())!, 
+                    provider.GetRequiredService<ISecretsManager>(),
+                    mailservice,
+                    Options.KvUrl
+                    );
 
                 return instance;
             });
@@ -58,10 +68,10 @@ namespace Notifications.API.Configurations
         {
             services.Configure<CredentialsKeySettings>(options =>
             {
-                options.Url = Environment.GetEnvironmentVariable("VaultUri")!.ToString();
+                options.KvUrl = Environment.GetEnvironmentVariable("VaultUri")!.ToString();
             });
 
-            services.Configure<CredentialsKeySettings>(config.GetSection("Outlook"));
+            services.Configure<CredentialsKeySettings>(config.GetSection("MailSettings"));
             return services;
         }
     }

@@ -15,7 +15,7 @@ namespace Notifications.Infraestruture.Email.Services
     public class NetMailService : IEmailService
     {
 
-        public async Task<bool> SendEmail(EmailToSendDto email, OutlookCredentials credentials)
+        public Task<bool> SendEmail(EmailToSendDto email, ServerCredentialsConfiguration credentialsConfiguration)
         {
             MailMessage mail;
             var success = false;
@@ -23,7 +23,7 @@ namespace Notifications.Infraestruture.Email.Services
             {
                 mail = new MailMessage
                 {
-                    From = new MailAddress(email.EmailFrom, "kevin")
+                    From = new MailAddress(email.EmailFrom, credentialsConfiguration.config.DisplayName)
                 };
                 mail.To.Add(email.EmailTo);
                 mail.IsBodyHtml = true;
@@ -40,16 +40,25 @@ namespace Notifications.Infraestruture.Email.Services
             // Enviar el correo electrónico
             try
             {
+                using SmtpClient SmtpClient = new (
+                    credentialsConfiguration.config.Host, 
+                    credentialsConfiguration.config.Port
+                    );
 
-                using SmtpClient cliente = new("smtp.office365.com", 587);
+                SmtpClient.Credentials = new NetworkCredential(
+                   credentialsConfiguration.credentials.Email,
+                   credentialsConfiguration.credentials.GetPassword()
+                   );
 
+                SmtpClient.UseDefaultCredentials = false;
 
-                cliente.UseDefaultCredentials = false;
-                cliente.Credentials = new NetworkCredential(credentials.Email, credentials.GetPassword());
-                cliente.EnableSsl = true;
-                cliente.DeliveryMethod = SmtpDeliveryMethod.Network;
+               
+                SmtpClient.EnableSsl = credentialsConfiguration.config.UseSSL;
+                SmtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+               
 
-                cliente.Send(mail);
+                SmtpClient.Send(mail);
+
                 success = true;
             }
 
@@ -65,7 +74,7 @@ namespace Notifications.Infraestruture.Email.Services
 
             }
 
-            return success;
+            return Task.FromResult(success);
         }
 
 

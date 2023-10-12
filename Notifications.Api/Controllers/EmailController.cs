@@ -34,8 +34,8 @@ namespace Notifications.Api.Controllers
         /// <param name="emailToSend"></param>
         /// <returns></returns>
        // [Authorize]
-        [HttpPost("Outlook")]
-        public async Task<IActionResult> SendEmailFromOutlook(EmailToSendDto emailToSend)
+        [HttpPost("SendEmail")]
+        public async Task<IActionResult> SendEmailAsync(EmailToSendDto emailToSend)
         {        
 
             var success = await _emailManager.SendEmail(emailToSend);

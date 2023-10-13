@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  notifications.api:
+    image: ${DOCKER_REGISTRY-}notificationsapi
+    build:
+      context: .
+      dockerfile: Notifications.Api/Dockerfile
+

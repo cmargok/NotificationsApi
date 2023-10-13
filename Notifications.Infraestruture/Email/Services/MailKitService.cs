@@ -25,14 +25,15 @@ namespace Notifications.Infraestruture.Email.Services
                 {
                     From = new MailAddress(email.EmailFrom, credentialsConfiguration.config.DisplayName)
                 };
-                mail.To.Add(email.EmailTo);
+                var maila = email.EmailsTo[0].Email;
+                mail.To.Add(maila);
                 mail.IsBodyHtml = true;
                 mail.Body = email.HtmlBody;
                 mail.Subject = email.Subject;
             }
             else
             {
-                mail = new MailMessage(email.EmailFrom, email.EmailTo, email.Subject, email.Message);
+                mail = new MailMessage(email.EmailFrom, email.EmailsTo[0].Email, email.Subject, email.Message);
 
             }
 

@@ -6,9 +6,7 @@ namespace Notifications.Application.Models.Email
     {
         [EmailAddress]
         public string EmailFrom { get; set; } = string.Empty;
-        public string DisplayName { get; set; } = string.Empty;
-
-        [EmailAddress]
+        public string DisplayName { get; set; } = string.Empty;     
         public List<To> EmailsTo { get; set; } = new List<To>();
         public string Subject{ get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
@@ -18,6 +16,7 @@ namespace Notifications.Application.Models.Email
         public class To
         {
             public string DisplayName { get; set; } = string.Empty;
+
             [EmailAddress]
             public string Email { get; set; } = string.Empty;
         }

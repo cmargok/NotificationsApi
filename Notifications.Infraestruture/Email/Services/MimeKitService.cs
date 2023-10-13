@@ -10,7 +10,8 @@ namespace Notifications.Infraestruture.Email.Services
 {
     public class MimeKitService : IEmailService
     {
-        public async Task<bool> SendEmail(EmailToSendDto email, ServerCredentialsConfiguration credentialsConfiguration, CancellationToken cancellationToken = default)
+        public async Task<bool> SendEmail(EmailToSendDto email, ServerCredentialsConfiguration credentialsConfiguration, 
+            CancellationToken cancellationToken = default)
         {
             var mail = new MimeMessage();
 
@@ -69,9 +70,9 @@ namespace Notifications.Infraestruture.Email.Services
                 await smtp.DisconnectAsync(true, cancellationToken);
                 return true;
             }
-            catch (Exception)
+            catch (Exception EX)
             {
-
+                Console.WriteLine(  EX.Message        );
                 return false;
             }
           

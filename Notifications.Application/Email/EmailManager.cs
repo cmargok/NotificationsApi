@@ -30,7 +30,7 @@ namespace Notifications.Application.Email
             if(ValidateData(emailToSend))
             {
                // var Credentials = await GetCredentials();
-                var Credentials = getfromConsole();
+                var Credentials = getFromEnviromentVariables();
                 var credentialsConfiguration = new ServerCredentialsConfiguration
                 {
                     credentials = Credentials,
@@ -72,13 +72,11 @@ namespace Notifications.Application.Email
             return credentials;
         }
 
-        private Credentials getfromConsole() {
-            Console.WriteLine("escriba correo");
-            string correo = Console.ReadLine();
+        private Credentials getFromEnviromentVariables() {
 
-            Console.WriteLine("escriba la ");
+            string correo = Environment.GetEnvironmentVariable("mail");
 
-            string pass = Console.ReadLine();
+            string pass = Environment.GetEnvironmentVariable("assp");
 
             var credentials = new Credentials { UserName = correo };
 

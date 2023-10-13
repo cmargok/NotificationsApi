@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # borramos docker
 **/Dockerfile
+/Notifications.Api/Dockerfile

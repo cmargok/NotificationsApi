@@ -46,9 +46,7 @@ namespace Notifications.Infraestruture.Email.Services
                 {
                     Text = email.Message
                 };
-            }
-
-           
+            }           
 
             try
             {

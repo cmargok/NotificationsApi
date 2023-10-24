@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  notifications.api:
+    image: ${DOCKER_REGISTRY-}notificationsapi:Windows
+    build:
+      context: .
+      dockerfile: Notifications.Api/Dockerfile
+    environment:
+        - mail=cmargokk@hotmail.com
+        - assp=Mikelu0102@9
+  
+    
+  
+

@@ -37,8 +37,7 @@ namespace Notifications.API.Configurations
                     provider.GetRequiredService<IEmailFactory>(), 
                     Options.Services.FirstOrDefault(o => o.ServiceName == mailservice.ToString())!, 
                     provider.GetRequiredService<ISecretsManager>(),
-                    mailservice,
-                    Options.KvUrl
+                    mailservice
                     );
 
                 return instance;
@@ -66,11 +65,7 @@ namespace Notifications.API.Configurations
         /// <param name="config"></param>
         /// <returns></returns>
         public static IServiceCollection AddOptionsConfigs(this IServiceCollection services, IConfiguration config)
-        {
-            services.Configure<CredentialsKeySettings>(options =>
-            {
-                options.KvUrl = Environment.GetEnvironmentVariable("VaultUri")!.ToString();
-            });
+        {        
 
             services.Configure<CredentialsKeySettings>(config.GetSection("MailSettings"));
             return services;

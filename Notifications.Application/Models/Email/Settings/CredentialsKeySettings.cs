@@ -11,7 +11,6 @@ namespace Notifications.Application.Models.Email.Settings
     public class CredentialsKeySettings
     {
         public List<MailSettings> Services { get; set; }
-        public string KvUrl { get; set; } = string.Empty;
 
         public CredentialsKeySettings()
         {

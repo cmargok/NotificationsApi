@@ -13,15 +13,13 @@ namespace Notifications.Application.Email
         private readonly IEmailService _emailService;
         private readonly ISecretsManager _secretsManager;
         private readonly MailSettings _credentialsKeySettings;
-        private readonly string _KvUrl;
 
         public EmailManager(IEmailFactory emailFactory, MailSettings settings, 
-                            ISecretsManager secretsManager, EnumMailServices mailService, string kvUrl)
+                            ISecretsManager secretsManager, EnumMailServices mailService)
         {
             _emailService = emailFactory.GetEmailService(mailService); 
             _credentialsKeySettings = settings;
             _secretsManager = secretsManager;
-            _KvUrl = kvUrl;
         }
 
 
@@ -61,7 +59,7 @@ namespace Notifications.Application.Email
 
 
       
-        private async Task<Credentials> GetCredentials()
+       /* private async Task<Credentials> GetCredentials()
         {
             var secretsDictionary = await _secretsManager.GetSecretsAsync(_KvUrl, _credentialsKeySettings.GetCredentials());
 
@@ -70,7 +68,7 @@ namespace Notifications.Application.Email
             credentials.SetPassword(secretsDictionary[_credentialsKeySettings.Password!]);
 
             return credentials;
-        }
+        }*/
 
         private Credentials getFromEnviromentVariables() {
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Notifications.Api.Middleware;
 using Notifications.Application.Email.Contracts;
 using Notifications.Application.Models.Email;
 using System.IdentityModel.Tokens.Jwt;
@@ -17,15 +18,17 @@ namespace Notifications.Api.Controllers
     public class EmailController : ControllerBase
     {   
         private readonly IEmailManager _emailManager;
+        private readonly IModerna mo;
 
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="emailManager"></param>
-        public EmailController(IEmailManager emailManager)
+        public EmailController(IEmailManager emailManager, IModerna mo)
         {
             _emailManager = emailManager;
+            this.mo = mo;
         }
 
         /// <summary>
@@ -62,6 +65,7 @@ namespace Notifications.Api.Controllers
         [HttpGet("MyToken")]
         public async Task<IActionResult> Asa(int id)
         {
+
             Claim[] claims = new[]
             {
                 new Claim(ClaimTypes.Name, "Kevinzin"),
@@ -75,15 +79,46 @@ namespace Notifications.Api.Controllers
                 issuer: "telefonica.com.co",
                 audience: "Public",
                 expires: DateTime.UtcNow.AddMinutes(50),
+                            
                 claims: claims,
                 signingCredentials: credentials
             );
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenString = tokenHandler.WriteToken(token);           
+            var tokenString = tokenHandler.WriteToken(token);      
+
+            var tokenString2 = await mo.Caller();
 
             return Ok(tokenString);
         }
 
+    }
+
+    public interface IModerna 
+    {
+        Task<string> Caller();
+    }
+
+    public class Moderna : IModerna
+    {
+        private readonly HttpClient _httpClient;
+       // private readonly ICorrelationIdSentinel _correlationIdSentinel;
+        //private const string _correlationIdHeader = ;
+
+        public Moderna(HttpClient httpClient/*, ICorrelationIdSentinel correlationIdSentinel*/)
+        {
+            _httpClient = httpClient;
+            //_correlationIdSentinel = correlationIdSentinel;
+        }
+
+        public async Task<string> Caller()
+        {
+        
+           // var response = await _httpClient.GetAsync("https://localhost:7220/api/limpio");
+
+           // var content = await response.Content.ReadAsStringAsync();
+
+            return "4";
+        }
     }
 }

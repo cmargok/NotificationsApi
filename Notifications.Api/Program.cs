@@ -1,7 +1,11 @@
-using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Notifications.Api.Controllers;
+using Notifications.Api.Middleware;
 using Notifications.API.Configurations;
+using System.Net.Http;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,9 +29,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]!))
         };
     });
+builder.Services.AddScoped<ICorrelationIdSentinel, CorrelationIdSentinel>();
+builder.Services.AddHttpClient<IModerna, Moderna>((o,p) =>
+{
+    var corr = p.GetRequiredService<ICorrelationIdSentinel>();
+
+    o.DefaultRequestHeaders.Add(corr.GetHeaderName(), corr.Get());
+
+    return new Moderna(o);
+});
+
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -44,5 +58,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<CorrelationIdMiddleware>();
 
 app.Run();

@@ -65,9 +65,15 @@ namespace Notifications.API.Configurations
         /// <param name="config"></param>
         /// <returns></returns>
         public static IServiceCollection AddOptionsConfigs(this IServiceCollection services, IConfiguration config)
-        {        
+        {
+            services
+                .AddOptions<CredentialsKeySettings>()
+                .BindConfiguration("MailSettings")
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
-            services.Configure<CredentialsKeySettings>(config.GetSection("MailSettings"));
+            //
+            //services.Configure<CredentialsKeySettings>(config.GetSection("MailSettings"));
             return services;
         }
     }

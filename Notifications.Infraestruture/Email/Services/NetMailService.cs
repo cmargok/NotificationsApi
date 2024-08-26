@@ -4,11 +4,10 @@ using MimeKit;
 using Notifications.Application.Email.Contracts;
 using Notifications.Application.Models.Email;
 using System.Net;
-using System.Runtime;
 
 namespace Notifications.Infraestruture.Email.Services
 {
-    public class MimeKitService : IEmailService
+    public class NetMailService : IEmailService
     {
         public async Task<bool> SendEmail(EmailToSendDto email, ServerCredentialsConfiguration credentialsConfiguration, 
             CancellationToken cancellationToken = default)
@@ -20,8 +19,8 @@ namespace Notifications.Infraestruture.Email.Services
                 credentialsConfiguration.credentials.UserName));
 
             mail.Sender = new MailboxAddress(
-                email.DisplayName,
-                email.EmailFrom);
+                credentialsConfiguration.config.DisplayName,
+                credentialsConfiguration.credentials.UserName);
 
             foreach (var mailAddress in email.EmailsTo)
             {

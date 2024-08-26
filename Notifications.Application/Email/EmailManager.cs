@@ -11,15 +11,15 @@ namespace Notifications.Application.Email
     public class EmailManager : IEmailManager
     {
         private readonly IEmailService _emailService;
-        private readonly ISecretsManager _secretsManager;
+      //  private readonly ISecretsManager _secretsManager;
         private readonly MailSettings _credentialsKeySettings;
 
         public EmailManager(IEmailFactory emailFactory, MailSettings settings, 
-                            ISecretsManager secretsManager, EnumMailServices mailService)
+                           /* ISecretsManager secretsManager,*/ EnumMailServices mailService)
         {
             _emailService = emailFactory.GetEmailService(mailService); 
             _credentialsKeySettings = settings;
-            _secretsManager = secretsManager;
+          //  _secretsManager = secretsManager;
         }
 
 
@@ -42,17 +42,21 @@ namespace Notifications.Application.Email
             return false;
         }
 
-        private bool ValidateData(EmailToSendDto emailToSend)
+        private static bool ValidateData(EmailToSendDto emailToSend)
         {
             ArgumentNullException.ThrowIfNull(emailToSend);
 
-            if (!emailToSend.EmailsTo.Any() || emailToSend.EmailsTo.Any(to => string.IsNullOrEmpty(to.Email))) return false;
+            if (emailToSend.EmailsTo.Count <= 0 || emailToSend.EmailsTo.Any(to => string.IsNullOrEmpty(to.Email))) 
+                return false;
 
-            if (string.IsNullOrEmpty(emailToSend.Subject) && emailToSend.Subject.Length > 2)  return false;
+            if (string.IsNullOrEmpty(emailToSend.Subject) && emailToSend.Subject.Length > 2)  
+                return false;
 
-            if (emailToSend.Html && string.IsNullOrEmpty(emailToSend.HtmlBody)) return false;
+            if (emailToSend.Html && string.IsNullOrEmpty(emailToSend.HtmlBody)) 
+                return false;
 
-            if (!emailToSend.Html && string.IsNullOrEmpty(emailToSend.Message))  return false;
+            if (!emailToSend.Html && string.IsNullOrEmpty(emailToSend.Message))  
+                return false;
 
             return true;
         }
@@ -72,16 +76,14 @@ namespace Notifications.Application.Email
 
         private Credentials getFromEnviromentVariables() {
 
-            string correo = Environment.GetEnvironmentVariable("mail");
+            string correo = Environment.GetEnvironmentVariable("mail")!;
 
-            string pass = Environment.GetEnvironmentVariable("assp");
+            string pass = Environment.GetEnvironmentVariable("assp")!;
 
             var credentials = new Credentials { UserName = correo };
-
             credentials.SetPassword(pass);
+
             return credentials;
-
-
         }
 
     }

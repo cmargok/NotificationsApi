@@ -1,21 +1,11 @@
-﻿using Notifications.Application.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Notifications.Application.Models.Email.Settings
+﻿namespace Notifications.Application.Models.Email.Settings
 {
 
     public class CredentialsKeySettings
     {
-        public List<MailSettings> Services { get; set; }
+        public List<MailSettings> Services { get; set; } = [];
 
-        public CredentialsKeySettings()
-        {
-            Services = new List<MailSettings>();
-        }
+       
 
 
 

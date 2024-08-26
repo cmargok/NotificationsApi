@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Notifications.Application.Email.Contracts;
+﻿using Notifications.Application.Email.Contracts;
 using Notifications.Application.Models.Email;
-using Notifications.Infraestruture.Externals.Azure;
+using System.Net;
+using System.Net.Mail;
 
 namespace Notifications.Infraestruture.Email.Services
 {
@@ -19,21 +13,25 @@ namespace Notifications.Infraestruture.Email.Services
         {
             MailMessage mail;
             var success = false;
+
             if (email.Html)
             {
                 mail = new MailMessage
                 {
-                    From = new MailAddress(email.EmailFrom, credentialsConfiguration.config.DisplayName)
+                    From = new MailAddress(credentialsConfiguration.credentials.UserName, credentialsConfiguration.config.DisplayName)
                 };
-                var maila = email.EmailsTo[0].Email;
-                mail.To.Add(maila);
+
+                foreach (var emailTo in email.EmailsTo)
+                {
+                    mail.To.Add(emailTo.Email);
+                }               
                 mail.IsBodyHtml = true;
                 mail.Body = email.HtmlBody;
                 mail.Subject = email.Subject;
             }
             else
             {
-                mail = new MailMessage(email.EmailFrom, email.EmailsTo[0].Email, email.Subject, email.Message);
+                mail = new MailMessage(credentialsConfiguration.credentials.UserName, email.EmailsTo[0].Email, email.Subject, email.Message);
 
             }
 
@@ -52,11 +50,8 @@ namespace Notifications.Infraestruture.Email.Services
                    );
 
                 SmtpClient.UseDefaultCredentials = false;
-
-               
                 SmtpClient.EnableSsl = credentialsConfiguration.config.UseSSL;
-                SmtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-               
+                SmtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;               
 
                 SmtpClient.Send(mail);
 
@@ -66,7 +61,7 @@ namespace Notifications.Infraestruture.Email.Services
             catch (Exception e)
             {
                 //aqui iria logging
-
+                Console.WriteLine(e.Message);
                 success = false;
             }
             finally

@@ -1,42 +1,57 @@
-﻿
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
-using Notifications.Application.Azure;
+using Microsoft.IdentityModel.Tokens;
 using Notifications.Application.Email;
 using Notifications.Application.Email.Contracts;
 using Notifications.Application.Email.Contracts.Factory;
-using Notifications.Application.Models.Email;
 using Notifications.Application.Models.Email.Settings;
 using Notifications.Infraestruture.Email;
-using Notifications.Infraestruture.Email.Services;
-using Notifications.Infraestruture.Externals.Azure;
+using System.Text;
 
 namespace Notifications.API.Configurations
 {
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public static class DependencyInjectionExtensions
+    public static class AuthConfigs
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
+        public static IServiceCollection AddAuthJwt(this IServiceCollection services, IConfiguration config)
+        {
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = config["JwtSettings:Issuer"],
+                        ValidAudience = config["JwtSettings:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:Key"]!))
+                    };
+                });
+
+            return services;
+
+        }
+
+        
+    }
+
+    public static class DependencyInjectionExtensions
+    {        
         public static IServiceCollection RegisterServices(this IServiceCollection services)
         {
             //email manager
             services.AddScoped<IEmailManager, EmailManager>(provider =>
             {
-                var mailservice = Application.Utils.EnumMailServices.MailKit;
-                Console.WriteLine(mailservice.ToString());
+                var mailservice = Application.Utils.EnumMailServices.NetMail;
+
                 var Options = provider.GetRequiredService<IOptions<CredentialsKeySettings>>().Value;
 
                 var instance = new EmailManager(
                     provider.GetRequiredService<IEmailFactory>(), 
                     Options.Services.FirstOrDefault(o => o.ServiceName == mailservice.ToString())!, 
-                    provider.GetRequiredService<ISecretsManager>(),
+                   // provider.GetRequiredService<ISecretsManager>(),
                     mailservice
                     );
 
@@ -47,23 +62,13 @@ namespace Notifications.API.Configurations
             services.AddScoped<IEmailFactory, EmailFactory>();
 
             //azure secrets
-            services.AddScoped<ISecretsManager, SecretsManager>();
+           // services.AddScoped<ISecretsManager, SecretsManager>();
             return services;
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public static class OptionsConfigs
     {
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="config"></param>
-        /// <returns></returns>
         public static IServiceCollection AddOptionsConfigs(this IServiceCollection services, IConfiguration config)
         {
             services

@@ -1,16 +1,12 @@
 ﻿using Notifications.Application.Models.Email;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Notifications.Application.Utils;
 
 namespace Notifications.Application.Email.Contracts
 {
     public interface IEmailManager
     {
 
-        Task<bool> SendEmail(EmailToSendDto emailToSend);
+        Task<ApiResponse<bool>> SendEmailAsync(EmailToSendDto emailToSend);
     }
 
 }

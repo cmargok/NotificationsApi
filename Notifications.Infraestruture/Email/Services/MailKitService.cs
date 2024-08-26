@@ -1,5 +1,6 @@
 ﻿using Notifications.Application.Email.Contracts;
 using Notifications.Application.Models.Email;
+using Notifications.Application.Models.Email.Settings;
 using System.Net;
 using System.Net.Mail;
 
@@ -8,8 +9,13 @@ namespace Notifications.Infraestruture.Email.Services
 
     public class MailKitService : IEmailService
     {
+        private readonly EmailSpeceificSettings _credentialsKeySettings;
 
-        public Task<bool> SendEmail(EmailToSendDto email, ServerCredentialsConfiguration credentialsConfiguration, CancellationToken cancellationToken = default)
+        public MailKitService(EmailSpeceificSettings credentialsKeySettings)
+        {
+            _credentialsKeySettings = credentialsKeySettings;
+        }
+        public Task<bool> SendEmail(EmailToSendDto email, CancellationToken cancellationToken = default)
         {
             MailMessage mail;
             var success = false;
@@ -18,7 +24,7 @@ namespace Notifications.Infraestruture.Email.Services
             {
                 mail = new MailMessage
                 {
-                    From = new MailAddress(credentialsConfiguration.credentials.UserName, credentialsConfiguration.config.DisplayName)
+                    From = new MailAddress(_credentialsKeySettings.Credentials.Email, _credentialsKeySettings.DisplayName)
                 };
 
                 foreach (var emailTo in email.EmailsTo)
@@ -31,7 +37,7 @@ namespace Notifications.Infraestruture.Email.Services
             }
             else
             {
-                mail = new MailMessage(credentialsConfiguration.credentials.UserName, email.EmailsTo[0].Email, email.Subject, email.Message);
+                mail = new MailMessage(_credentialsKeySettings.Credentials.Email, email.EmailsTo[0].Email, email.Subject, email.Message);
 
             }
 
@@ -40,17 +46,17 @@ namespace Notifications.Infraestruture.Email.Services
             try
             {
                 using SmtpClient SmtpClient = new (
-                    credentialsConfiguration.config.Host, 
-                    credentialsConfiguration.config.Port
+                    _credentialsKeySettings.Host,
+                    _credentialsKeySettings.Port
                     );
 
                 SmtpClient.Credentials = new NetworkCredential(
-                   credentialsConfiguration.credentials.UserName,
-                   credentialsConfiguration.credentials.GetPassword()
+                   _credentialsKeySettings.Credentials.Email,
+                   _credentialsKeySettings.Credentials.GetPassword()
                    );
 
                 SmtpClient.UseDefaultCredentials = false;
-                SmtpClient.EnableSsl = credentialsConfiguration.config.UseSSL;
+                SmtpClient.EnableSsl = _credentialsKeySettings.UseSSL;
                 SmtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;               
 
                 SmtpClient.Send(mail);

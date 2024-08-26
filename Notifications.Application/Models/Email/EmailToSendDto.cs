@@ -4,7 +4,7 @@ namespace Notifications.Application.Models.Email
 {
     public class EmailToSendDto
     {    
-        public List<To> EmailsTo { get; set; } = new List<To>();
+        public List<To> EmailsTo { get; set; } = [];
         public string Subject{ get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
         public bool Html { get; set; } = false;

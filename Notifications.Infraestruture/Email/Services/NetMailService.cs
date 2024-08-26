@@ -3,24 +3,31 @@ using MailKit.Security;
 using MimeKit;
 using Notifications.Application.Email.Contracts;
 using Notifications.Application.Models.Email;
+using Notifications.Application.Models.Email.Settings;
 using System.Net;
 
 namespace Notifications.Infraestruture.Email.Services
 {
     public class NetMailService : IEmailService
     {
-        public async Task<bool> SendEmail(EmailToSendDto email, ServerCredentialsConfiguration credentialsConfiguration, 
-            CancellationToken cancellationToken = default)
+        private readonly EmailSpeceificSettings _credentialsKeySettings;
+
+        public NetMailService(EmailSpeceificSettings credentialsKeySettings)
+        {
+            _credentialsKeySettings = credentialsKeySettings;
+        }
+
+        public async Task<bool> SendEmail(EmailToSendDto email,CancellationToken cancellationToken = default)
         {
             var mail = new MimeMessage();
 
             mail.From.Add(new MailboxAddress(
-                credentialsConfiguration.config.DisplayName,
-                credentialsConfiguration.credentials.UserName));
+                _credentialsKeySettings.DisplayName,
+                _credentialsKeySettings.Credentials.Email));
 
             mail.Sender = new MailboxAddress(
-                credentialsConfiguration.config.DisplayName,
-                credentialsConfiguration.credentials.UserName);
+                _credentialsKeySettings.DisplayName,
+                _credentialsKeySettings.Credentials.Email);
 
             foreach (var mailAddress in email.EmailsTo)
             {
@@ -52,30 +59,26 @@ namespace Notifications.Infraestruture.Email.Services
                 using var smtp = new SmtpClient();
 
                 smtp.CheckCertificateRevocation = false;
-                if (credentialsConfiguration.config.UseSSL)
+                if (_credentialsKeySettings.UseSSL)
                 {
-                    await smtp.ConnectAsync(credentialsConfiguration.config.Host, credentialsConfiguration.config.Port, SecureSocketOptions.SslOnConnect, cancellationToken);
+                    await smtp.ConnectAsync(_credentialsKeySettings.Host, _credentialsKeySettings.Port, SecureSocketOptions.SslOnConnect, cancellationToken);
                 }
-                else if (credentialsConfiguration.config.UseStartTls)
+                else if (_credentialsKeySettings.UseStartTls)
                 {
-                    await smtp.ConnectAsync(credentialsConfiguration.config.Host, credentialsConfiguration.config.Port, SecureSocketOptions.StartTls, cancellationToken);
+                    await smtp.ConnectAsync(_credentialsKeySettings.Host, _credentialsKeySettings.Port, SecureSocketOptions.StartTls, cancellationToken);
                 }
               
-                await smtp.AuthenticateAsync(new NetworkCredential(credentialsConfiguration.credentials.UserName, credentialsConfiguration.credentials.GetPassword()), cancellationToken);
+                await smtp.AuthenticateAsync(new NetworkCredential(_credentialsKeySettings.Credentials.Email, _credentialsKeySettings.Credentials.GetPassword()), cancellationToken);
 
                 await smtp.SendAsync(mail, cancellationToken);
                 await smtp.DisconnectAsync(true, cancellationToken);
                 return true;
             }
-            catch (Exception EX)
+            catch (Exception ex)
             {
-                Console.WriteLine(  EX.Message        );
+                Console.WriteLine(ex.Message);
                 return false;
             }
-          
-
-      
-
         }
     }
 

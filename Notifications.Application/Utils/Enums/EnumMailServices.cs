@@ -1,4 +1,4 @@
-﻿namespace Notifications.Application.Utils
+﻿namespace Notifications.Application.Utils.Enums
 {
     public enum EnumMailServices
     {

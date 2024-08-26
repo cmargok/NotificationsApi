@@ -1,11 +1,12 @@
-using Notifications.Api.Controllers;
+using Notifications.Api.Configurations.Modules;
 using Notifications.Api.Middleware;
 using Notifications.API.Configurations;
+using Notifications.Infraestruture.Correlation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOptionsConfigs(builder.Configuration);
 
+builder.Services.AddEmailOptions(builder.Configuration);
 builder.Services.RegisterServices();
 // Add services to the container.
 
@@ -23,6 +24,8 @@ builder.Services.AddScoped<ICorrelationIdSentinel, CorrelationIdSentinel>();
 
 builder.Services.AddControllers();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

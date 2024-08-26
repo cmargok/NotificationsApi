@@ -1,17 +1,11 @@
-﻿using Notifications.Application.Email.Contracts;
-using Notifications.Application.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Notifications.Application.Utils.Enums;
 
 namespace Notifications.Application.Email.Contracts.Factory
 {
-    public interface IEmailFactory
+    public interface IEmailStrategy
     {
 
-        public IEmailService GetEmailService(EnumMailServices mailServices);
+        public IEmailService GetEmailService();
     }
 
 
